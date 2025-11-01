@@ -3,116 +3,330 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Test de Colonias — Selección Progresiva</title>
+<title>Test de Colonias — Selección Progresiva (Paso a paso)</title>
 <style>
-body {background:#0b0f14;color:#e7eef7;font-family:system-ui,Arial,sans-serif;margin:0;padding:0}
-.card{background:#121821;border:1px solid #202C3D;border-radius:14px;padding:20px;margin:20px auto;max-width:800px}
-.btn{border:1px solid #2a3950;background:#1f2a3a;color:#e7eef7;padding:10px 16px;border-radius:10px;cursor:pointer}
-.btn:hover{background:#243145}
-.choice{border:1px dashed #2a3950;border-radius:12px;padding:18px;background:#121a2a;text-align:center;margin:10px}
-.code{font-size:26px;font-weight:800;margin-bottom:8px}
-.hidden{display:none}
-.final-card{border:1px solid #2a3950;border-radius:12px;padding:14px;margin:10px;background:#121a2a}
-.winner{border-color:#ffd54a;box-shadow:0 0 0 3px rgba(255,213,74,.15)}
-.second{border-color:#c7d1da;box-shadow:0 0 0 3px rgba(199,209,218,.15)}
-.third{border-color:#d6a171;box-shadow:0 0 0 3px rgba(214,161,113,.15)}
+  :root {
+    --bg: #0b0f14;
+    --panel: #121821;
+    --panel-2: #182231;
+    --text: #e7eef7;
+    --muted: #a8b3c2;
+    --accent: #7bdcff;
+    --danger: #ff7b7b;
+    --gold: #ffd54a;
+    --silver: #c7d1da;
+    --bronze: #d6a171;
+    --btn: #1f2a3a;
+    --btn-hover: #243145;
+    --ring: rgba(123,220,255,0.4);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: radial-gradient(1200px 800px at 20% -10%, #132033 0%, #0b0f14 55%) no-repeat, var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  }
+  header { padding: 20px clamp(16px,4vw,32px); display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+  .title { font-size: clamp(18px, 2vw, 22px); font-weight: 700; }
+  main { max-width: 980px; margin: 0 auto; padding: 0 clamp(16px,4vw,32px) 40px; display: grid; gap: 18px; }
+  .card { background: linear-gradient(180deg, var(--panel), var(--panel-2)); border-radius: 14px; border: 1px solid #202C3D; padding: clamp(16px,4vw,24px); }
+  .row { display: grid; gap: 12px; }
+  label { font-size: 14px; color: var(--muted); }
+  input[type="text"] {
+    width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #243145; background: #111826; color: var(--text); outline: none;
+  }
+  input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
+  .btn {
+    border: 1px solid #2a3950; background: linear-gradient(180deg, var(--btn), #182236); color: var(--text);
+    padding: 12px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; letter-spacing: .2px;
+  }
+  .btn:hover { background: var(--btn-hover); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .choice-wrap { display: grid; gap: 12px; grid-template-columns: 1fr 80px 1fr; align-items: stretch; }
+  .choice { display: grid; place-items: center; gap: 8px; border: 1px dashed #2a3950; border-radius: 12px; padding: 18px; background: #121a2a; text-align: center; }
+  .code { font-size: 28px; font-weight: 800; letter-spacing: .5px; }
+  .vs { display: grid; place-items: center; color: var(--muted); font-weight: 700; }
+  .selected { outline: 2px solid var(--accent); box-shadow: 0 0 0 6px rgba(123,220,255,.12); }
+  .ctas { display: flex; gap: 10px; flex-wrap: wrap; }
+  .hidden { display: none !important; }
+  .finalists { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .final-card { border: 1px solid #2a3950; border-radius: 12px; padding: 14px; background: #121a2a; display: grid; gap: 8px; }
+  .winner { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(255,213,74,.15); }
+  .second { border-color: var(--silver); box-shadow: 0 0 0 3px rgba(199,209,218,.15); }
+  .third { border-color: var(--bronze); box-shadow: 0 0 0 3px rgba(214,161,113,.15); }
+  .pill { display: inline-flex; gap: 8px; align-items: center; padding: 6px 10px; border-radius: 999px; border: 1px solid #253149; background: #0f1625; color: var(--muted); font-size: 12px; }
 </style>
 </head>
 <body>
-<div class="card" id="setup">
-<h3>Inicio</h3>
-<p>Colonias: 1, 2, 3, 5, 6, 7M, 7H, 8, 9</p>
-<label>Nombre del sujeto:</label>
-<input id="subject" style="width:100%;padding:8px;border-radius:8px;border:1px solid #243145;background:#111826;color:#fff">
-<br><br><button class="btn" id="start">Empezar prueba</button>
-</div>
+  <header>
+    <div class="title">Test de Colonias · Paso a paso</div>
+    <div class="pill">Modo oscuro · Offline</div>
+  </header>
+  <main>
+    <section id="setup" class="card row">
+      <div>
+        <label for="subject">Sujeto (nombre o código)</label>
+        <input id="subject" type="text" placeholder="Ej.: Laura · S01" />
+      </div>
+      <div>Colonias: <strong>1, 2, 3, 5, 6, 7M, 7H, 8, 9</strong></div>
+      <div class="ctas">
+        <button class="btn" id="start">Empezar prueba</button>
+      </div>
+    </section>
 
-<div class="card hidden" id="round1">
-<h3>Ronda 1 · Emparejamientos fijos</h3>
-<div id="r1pairs"></div>
-<button class="btn hidden" id="toRound2">Ir a Ronda 2</button>
-</div>
+    <section id="round1" class="card row hidden">
+      <div class="pill">Ronda 1 · Emparejamientos fijos</div>
+      <div id="r1Progress"></div>
+      <div id="r1Duel" class="choice-wrap"></div>
+      <div class="ctas">
+        <button class="btn" id="r1Next" disabled>Siguiente</button>
+      </div>
+    </section>
 
-<div class="card hidden" id="round2">
-<h3>Ronda 2 · Semifinal</h3>
-<div id="r2pairs"></div>
-<button class="btn hidden" id="toFinal">Ir a Final</button>
-</div>
+    <section id="round2" class="card row hidden">
+      <div class="pill">Ronda 2 · Semifinal</div>
+      <div id="r2Progress"></div>
+      <div id="r2Duel" class="choice-wrap"></div>
+      <div class="ctas">
+        <button class="btn" id="r2Next" disabled>Siguiente</button>
+      </div>
+    </section>
 
-<div class="card hidden" id="final">
-<h3>Ronda 3 · Final (1ª / 2ª / 3ª)</h3>
-<div id="finalists"></div>
-<button class="btn hidden" id="showResults">Mostrar resultados</button>
-</div>
+    <section id="final" class="card row hidden">
+      <div class="pill">Ronda 3 · Final (elige 1º / 2º / 3º)</div>
+      <div id="finalists" class="finalists"></div>
+      <div class="ctas">
+        <button class="btn hidden" id="showResults">Mostrar resultados</button>
+      </div>
+    </section>
 
-<div class="card hidden" id="results">
-<h3>Resultados</h3>
-<div id="resultContent"></div>
-</div>
+    <section id="results" class="card row hidden">
+      <div class="pill">Resultados</div>
+      <div id="resultContent" class="row"></div>
+      <div class="ctas">
+        <button class="btn" id="copy">Copiar</button>
+        <button class="btn" id="export">Descargar CSV (este sujeto)</button>
+      </div>
+    </section>
+  </main>
 
 <script>
-const LABELS=["1","2","3","5","6","7M","7H","8","9"];
-let subject='',r1Pairs=[],r1Winners=[],r2Pairs=[],r2Winners=[],finalists=[],finalRanks={};
-const $=s=>document.querySelector(s);
-function el(t,c,txt){const e=document.createElement(t);if(c)e.className=c;if(txt)e.textContent=txt;return e;}
-function clear(n){n.innerHTML='';}
-function show(id,vis){$(id).classList.toggle('hidden',!vis);}
+// --- Setup & data ---
+const LABELS = ["1","2","3","5","6","7M","7H","8","9"]; // fixed labels
+// Round 1 pairs fixed, 9 is bye
+const R1_PAIRS = [["1","2"],["3","5"],["6","7H"],["7M","8"]];
+const R1_BYE = "9";
 
-function buildRound1(){
- r1Pairs=[["1","2"],["3","5"],["6","7H"],["7M","8"]];
- r1Winners=[]; const bye="9"; const cont=$("#r1pairs"); clear(cont);
- r1Pairs.forEach(pair=>{
-   const wrap=el('div'); wrap.style.display='flex'; wrap.style.justifyContent='space-around';
-   pair.forEach(c=>{const d=el('div','choice');d.appendChild(el('div','code',c));
-     const b=el('button','btn','Elegir');b.onclick=()=>{if(!r1Winners.includes(c))r1Winners.push(c);checkComplete();};
-     d.appendChild(b);wrap.appendChild(d);});cont.appendChild(wrap);});
- function checkComplete(){if(r1Winners.length===r1Pairs.length){r1Winners.push(bye);$("#toRound2").classList.remove('hidden');}}
+let subject = "";
+let r1Index = 0;
+let r1Winners = [];
+let r2Index = 0;
+let r2Pairs = [];
+let r2Winners = [];
+let finalists = [];
+let finalRanks = {}; // label -> 1/2/3
+
+// UI helpers
+const $ = s => document.querySelector(s);
+function el(tag, cls, txt){ const e = document.createElement(tag); if(cls) e.className = cls; if(txt) e.textContent = txt; return e; }
+function clear(n){ n.innerHTML = ""; }
+function setDisabled(btn, val){ btn.disabled = !!val; }
+
+// Local storage for exporting
+const LS_KEY = "colonias_resultados_step_v1";
+function saveResult(rec){
+  const arr = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+  arr.push(rec);
+  localStorage.setItem(LS_KEY, JSON.stringify(arr));
 }
 
-function buildRound2(){
- r2Pairs=[];r2Winners=[];const arr=r1Winners.slice();const bye=arr.pop();
- const cont=$("#r2pairs");clear(cont);
- for(let i=0;i<arr.length;i+=2){const pair=[arr[i],arr[i+1]];r2Pairs.push(pair);
-   const wrap=el('div');wrap.style.display='flex';wrap.style.justifyContent='space-around';
-   pair.forEach(c=>{const d=el('div','choice');d.appendChild(el('div','code',c));
-     const b=el('button','btn','Elegir');b.onclick=()=>{if(!r2Winners.includes(c))r2Winners.push(c);checkComplete();};
-     d.appendChild(b);wrap.appendChild(d);});cont.appendChild(wrap);}
- function checkComplete(){if(r2Winners.length===r2Pairs.length){r2Winners.push(bye);$("#toFinal").classList.remove('hidden');}}
+// --- Round 1 (step-by-step) ---
+function showR1Duel(){
+  clear($("#r1Duel"));
+  const [A,B] = R1_PAIRS[r1Index];
+  $("#r1Progress").textContent = `Duelos: ${r1Index+1} / ${R1_PAIRS.length}  —  (9 pasa directa)`;
+
+  const left = duelCard(A, () => selectR1(A, left, right));
+  const vs = el("div", "vs", "VS");
+  const right = duelCard(B, () => selectR1(B, left, right));
+
+  $("#r1Duel").append(left, vs, right);
+  setDisabled($("#r1Next"), true);
+}
+function duelCard(code, onPick){
+  const d = el("div","choice");
+  const c = el("div","code",code);
+  const b = el("button","btn","Elegir");
+  b.onclick = onPick;
+  d.append(c, b);
+  return d;
+}
+function selectR1(winner, leftCard, rightCard){
+  // Visual mark
+  [leftCard, rightCard].forEach(c => c.classList.remove("selected"));
+  const chosen = (leftCard.querySelector(".code").textContent === winner) ? leftCard : rightCard;
+  chosen.classList.add("selected");
+
+  // Store temporary choice for this duel
+  $("#r1Next").dataset.winner = winner;
+  setDisabled($("#r1Next"), false);
+}
+$("#r1Next").addEventListener("click", () => {
+  const w = $("#r1Next").dataset.winner;
+  if(!w) return;
+  r1Winners.push(w);
+  r1Index++;
+  if(r1Index < R1_PAIRS.length){
+    showR1Duel();
+  }else{
+    // push bye and go to round 2
+    r1Winners.push(R1_BYE);
+    startRound2();
+  }
+});
+
+// --- Round 2 (step-by-step) ---
+function startRound2(){
+  // build pairs from winners (5 -> 2 pairs + bye)
+  const arr = r1Winners.slice();
+  const bye = arr.pop();
+  r2Pairs = [[arr[0],arr[1]],[arr[2],arr[3]]];
+  r2Index = 0;
+  r2Winners = [];
+  $("#r1").classList?.add("hidden");
+  $("#round1").classList.add("hidden");
+  $("#round2").classList.remove("hidden");
+  showR2Duel(bye);
+}
+function showR2Duel(bye){
+  clear($("#r2Duel"));
+  $("#r2Progress").textContent = `Duelos: ${r2Index+1} / ${r2Pairs.length}  —  (${bye} pasa directa)`;
+
+  const [A,B] = r2Pairs[r2Index];
+  const left = duelCard(A, () => selectR2(A, left, right, bye));
+  const vs = el("div","vs","VS");
+  const right = duelCard(B, () => selectR2(B, left, right, bye));
+  $("#r2Duel").append(left, vs, right);
+  setDisabled($("#r2Next"), true);
+}
+function selectR2(winner, leftCard, rightCard, bye){
+  [leftCard,rightCard].forEach(c=>c.classList.remove("selected"));
+  const chosen = (leftCard.querySelector(".code").textContent === winner) ? leftCard : rightCard;
+  chosen.classList.add("selected");
+  $("#r2Next").dataset.winner = winner;
+  setDisabled($("#r2Next"), false);
+}
+$("#r2Next").addEventListener("click", () => {
+  const w = $("#r2Next").dataset.winner;
+  if(!w) return;
+  r2Winners.push(w);
+  r2Index++;
+  const arr = r1Winners.slice();
+  const bye = arr.pop();
+  if(r2Index < r2Pairs.length){
+    showR2Duel(bye);
+  }else{
+    // finalists = r2 winners + bye
+    finalists = r2Winners.slice(); finalists.push(bye);
+    startFinal();
+  }
+});
+
+// --- Final (rank 1/2/3) ---
+function startFinal(){
+  $("#round2").classList.add("hidden");
+  $("#final").classList.remove("hidden");
+  finalRanks = {};
+  const cont = $("#finalists");
+  clear(cont);
+  finalists.forEach(code => cont.appendChild(finalCard(code)));
+}
+function finalCard(code){
+  const wrap = el("div","final-card");
+  wrap.appendChild(el("div","code",code));
+  const b1 = el("button","btn","1º");
+  const b2 = el("button","btn","2º");
+  const b3 = el("button","btn","3º");
+  b1.onclick = () => setRank(code,1,wrap);
+  b2.onclick = () => setRank(code,2,wrap);
+  b3.onclick = () => setRank(code,3,wrap);
+  wrap.append(b1,b2,b3);
+  return wrap;
+}
+function setRank(code, rank, wrap){
+  // one finalist per rank
+  for(const k in finalRanks){ if(finalRanks[k] === rank) delete finalRanks[k]; }
+  finalRanks[code] = rank;
+  document.querySelectorAll(".final-card").forEach(x=>x.classList.remove("winner","second","third"));
+  for(const [c,r] of Object.entries(finalRanks)){
+    const card = Array.from(document.querySelectorAll(".final-card")).find(n => n.querySelector(".code").textContent === c);
+    if(!card) continue;
+    if(r===1) card.classList.add("winner");
+    if(r===2) card.classList.add("second");
+    if(r===3) card.classList.add("third");
+  }
+  if(Object.keys(finalRanks).length === 3) $("#showResults").classList.remove("hidden");
+}
+$("#showResults").addEventListener("click", () => {
+  $("#final").classList.add("hidden");
+  $("#results").classList.remove("hidden");
+  renderResults();
+});
+
+// --- Results & export ---
+function renderResults(){
+  const box = $("#resultContent"); clear(box);
+  const ranked = Object.entries(finalRanks).sort((a,b)=>a[1]-b[1]).map(([c])=>c);
+  const gold = ranked[0], silver = ranked[1], bronze = ranked[2];
+
+  box.appendChild(el("div", null, `Sujeto: ${subject}`));
+  box.appendChild(el("div", null, `Ronda 1 ganadoras: ${r1Winners.join(", ")}`));
+  box.appendChild(el("div", null, `Finalistas: ${finalists.join(", ")}`));
+  box.appendChild(el("div", null, `🏆 1ª: ${gold}   ·   🥈 2ª: ${silver}   ·   🥉 3ª: ${bronze}`));
+
+  // Save record
+  saveResult({
+    ts: new Date().toISOString(),
+    subject, labels: LABELS, r1Winners, finalists, gold, silver, bronze
+  });
+
+  // Export buttons
+  $("#copy").onclick = () => {
+    const text = `Sujeto: ${subject}\n1ª: ${gold}\n2ª: ${silver}\n3ª: ${bronze}\nFinalistas: ${finalists.join(", ")}\nR1 ganadoras: ${r1Winners.join(", ")}`;
+    navigator.clipboard.writeText(text).then(()=>alert("Copiado al portapapeles."));
+  };
+  $("#export").onclick = () => {
+    const rows = [["timestamp","sujeto","1a","2a","3a","finalistas","r1_winners"]];
+    rows.push([new Date().toISOString(), subject, gold, silver, bronze, finalists.join(" | "), r1Winners.join(" | ")]);
+    download("resultado_"+subject.replace(/\s+/g,"_")+".csv", toCSV(rows));
+  };
 }
 
-function buildFinal(){
- finalists=r2Winners.slice();finalRanks={};
- const cont=$("#finalists");clear(cont);
- finalists.forEach(c=>{const d=el('div','final-card');d.appendChild(el('div','code',c));
- [1,2,3].forEach(rank=>{const b=el('button','btn',rank+'º');b.onclick=()=>setRank(c,rank);d.appendChild(b);});
- cont.appendChild(d);});
+function toCSV(rows){
+  return rows.map(r => r.map(x => {
+    const s = (x ?? "").toString();
+    return /[\",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  }).join(",")).join("\n");
+}
+function download(filename, text){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], {type:"text/csv;charset=utf-8;"}));
+  a.download = filename; a.click(); URL.revokeObjectURL(a.href);
 }
 
-function setRank(c,rank){
- for(const k in finalRanks)if(finalRanks[k]===rank)delete finalRanks[k];
- finalRanks[c]=rank;
- document.querySelectorAll('.final-card').forEach(x=>x.classList.remove('winner','second','third'));
- for(const [cc,r] of Object.entries(finalRanks)){
-   const card=[...document.querySelectorAll('.final-card')].find(x=>x.textContent.includes(cc));
-   if(!card)continue;
-   if(r===1)card.classList.add('winner');if(r===2)card.classList.add('second');if(r===3)card.classList.add('third');
- }
- if(Object.keys(finalRanks).length===3)$("#showResults").classList.remove('hidden');
-}
+// --- Start wiring ---
+$("#start").addEventListener("click", () => {
+  subject = $("#subject").value.trim();
+  if(!subject){ alert("Introduce el nombre o código del sujeto."); return; }
+  $("#setup").classList.add("hidden");
+  $("#round1").classList.remove("hidden");
+  // reset state
+  r1Index = 0; r1Winners = []; r2Index = 0; r2Pairs = []; r2Winners = []; finalists = []; finalRanks = {};
+  showR1Duel();
+});
 
-function resultsView(){
- const box=$("#resultContent");clear(box);
- const arr=Object.entries(finalRanks).sort((a,b)=>a[1]-b[1]);
- box.appendChild(el('p',null,'Sujeto: '+subject));
- box.appendChild(el('p',null,'1ª: '+arr[0][0]+' | 2ª: '+arr[1][0]+' | 3ª: '+arr[2][0]));
- box.appendChild(el('p',null,'Finalistas: '+finalists.join(', ')));
-}
-
-$("#start").onclick=()=>{subject=$("#subject").value.trim();if(!subject)return alert('Introduce un nombre');
- show('#setup',false);show('#round1',true);buildRound1();};
-$("#toRound2").onclick=()=>{show('#round1',false);show('#round2',true);buildRound2();};
-$("#toFinal").onclick=()=>{show('#round2',false);show('#final',true);buildFinal();};
-$("#showResults").onclick=()=>{show('#final',false);show('#results',true);resultsView();};
 </script>
 </body>
 </html>
