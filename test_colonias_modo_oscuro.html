@@ -5,479 +5,114 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Test de Colonias — Selección Progresiva</title>
 <style>
-  :root {
-    --bg: #0b0f14;
-    --panel: #121821;
-    --panel-2: #182231;
-    --text: #e7eef7;
-    --muted: #a8b3c2;
-    --accent: #7bdcff;
-    --accent-2: #85ffa6;
-    --danger: #ff7b7b;
-    --gold: #ffd54a;
-    --silver: #c7d1da;
-    --bronze: #d6a171;
-    --btn: #1f2a3a;
-    --btn-hover: #243145;
-    --ring: rgba(123,220,255,0.4);
-  }
-  * { box-sizing: border-box; }
-  html, body { height: 100%; }
-  body {
-    margin: 0;
-    background: radial-gradient(1200px 800px at 20% -10%, #132033 0%, #0b0f14 55%) no-repeat, var(--bg);
-    color: var(--text);
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
-    line-height: 1.4;
-  }
-  header {
-    padding: 20px clamp(16px, 4vw, 32px);
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px;
-  }
-  .title {
-    font-size: clamp(18px, 2vw, 22px);
-    font-weight: 700;
-    letter-spacing: .2px;
-  }
-  .card {
-    background: linear-gradient(180deg, var(--panel), var(--panel-2));
-    border: 1px solid #202C3D;
-    border-radius: 14px;
-    padding: clamp(16px, 4vw, 24px);
-    box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
-  }
-  main {
-    max-width: 980px; margin: 0 auto;
-    padding: 0 clamp(16px, 4vw, 32px) 40px;
-    display: grid; gap: 18px;
-  }
-  .row { display: grid; gap: 12px; }
-  .grid {
-    display: grid; gap: 12px;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  }
-  label { font-size: 14px; color: var(--muted); }
-  input[type="text"] {
-    width: 100%; padding: 12px 14px;
-    border-radius: 10px; border: 1px solid #243145;
-    background: #111826; color: var(--text);
-    outline: none;
-  }
-  input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
-  .btn {
-    appearance: none; border: 1px solid #2a3950;
-    background: linear-gradient(180deg, var(--btn), #182236);
-    color: var(--text);
-    padding: 12px 16px; border-radius: 12px;
-    cursor: pointer; font-weight: 600; letter-spacing: .2px;
-    transition: transform .05s ease, background .2s ease, border-color .2s ease;
-  }
-  .btn:hover { background: var(--btn-hover); }
-  .btn:active { transform: translateY(1px); }
-  .btn-primary {
-    border-color: #28536e;
-    background: linear-gradient(180deg, #1d3347, #1b2b40);
-  }
-  .btn-accent { border-color: #256b7c; background: linear-gradient(180deg, #1a3a46, #163640); }
-  .btn-danger { border-color: #6b2b2b; }
-  .pair {
-    display: grid; gap: 10px;
-    grid-template-columns: 1fr 1fr;
-    align-items: stretch;
-  }
-  .pill {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 6px 10px; border-radius: 999px;
-    background: #0f1625; color: var(--muted); font-size: 12px;
-    border: 1px solid #253149;
-  }
-  .choice {
-    display: flex; flex-direction: column; gap: 10px;
-    align-items: center; justify-content: center;
-    border: 1px dashed #2a3950; border-radius: 12px; padding: 18px;
-    background: #121a2a;
-  }
-  .choice .code {
-    font-size: 28px; font-weight: 800; letter-spacing: .5px;
-  }
-  .choice .desc { color: var(--muted); font-size: 12px; }
-  .ctas { display: flex; flex-wrap: wrap; gap: 10px; }
-  .hidden { display: none !important; }
-  .separator { height: 1px; background: #22314a; margin: 8px 0 14px; }
-  .badges { display: flex; gap: 8px; flex-wrap: wrap; }
-  .badge { padding: 6px 10px; border-radius: 999px; background: #152033; border: 1px solid #27344b; font-size: 12px; }
-  .finalists { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-  .final-card {
-    border: 1px solid #2a3950; border-radius: 12px; padding: 14px; background: #121a2a;
-    display: grid; gap: 10px; align-content: start;
-  }
-  .rank-buttons { display: flex; gap: 8px; }
-  .rank-btn { flex: 1; }
-  .winner {
-    border: 1px solid var(--gold); box-shadow: 0 0 0 3px rgba(255,213,74,.12);
-  }
-  .second { border: 1px solid var(--silver); box-shadow: 0 0 0 3px rgba(199,209,218,.12); }
-  .third { border: 1px solid var(--bronze); box-shadow: 0 0 0 3px rgba(214,161,113,.12); }
-  .result-line { display: flex; align-items: center; gap: 8px; }
-  .result-line strong { min-width: 100px; }
-  footer { opacity: .7; padding: 8px 16px 24px; text-align: center; font-size: 12px; }
+body {background:#0b0f14;color:#e7eef7;font-family:system-ui,Arial,sans-serif;margin:0;padding:0}
+.card{background:#121821;border:1px solid #202C3D;border-radius:14px;padding:20px;margin:20px auto;max-width:800px}
+.btn{border:1px solid #2a3950;background:#1f2a3a;color:#e7eef7;padding:10px 16px;border-radius:10px;cursor:pointer}
+.btn:hover{background:#243145}
+.choice{border:1px dashed #2a3950;border-radius:12px;padding:18px;background:#121a2a;text-align:center;margin:10px}
+.code{font-size:26px;font-weight:800;margin-bottom:8px}
+.hidden{display:none}
+.final-card{border:1px solid #2a3950;border-radius:12px;padding:14px;margin:10px;background:#121a2a}
+.winner{border-color:#ffd54a;box-shadow:0 0 0 3px rgba(255,213,74,.15)}
+.second{border-color:#c7d1da;box-shadow:0 0 0 3px rgba(199,209,218,.15)}
+.third{border-color:#d6a171;box-shadow:0 0 0 3px rgba(214,161,113,.15)}
 </style>
 </head>
 <body>
-  <header>
-    <div class="title">Test de Colonias · Selección Progresiva</div>
-    <div class="badges">
-      <span class="badge">Modo oscuro</span>
-      <span class="badge">Sin servidor</span>
-      <span class="badge">Exportable</span>
-    </div>
-  </header>
-  <main>
-    <section id="setup" class="card row">
-      <div class="grid">
-        <div>
-          <label for="subject">Sujeto (nombre o código)</label>
-          <input id="subject" type="text" placeholder="Ej.: Laura · S01" />
-        </div>
-        <div>
-          <label>Colonias (códigos)</label>
-          <div class="pill">1, 2, 3, 5, 6, 7M, 7H, A1, A2</div>
-          <div class="separator"></div>
-          <button class="btn btn-primary" id="start">Empezar prueba</button>
-        </div>
-      </div>
-      <small style="color:var(--muted)">Ronda 1: se emparejan las 8 primeras en el orden mostrado; la 9ª pasa a la siguiente ronda automáticamente.</small>
-    </section>
+<div class="card" id="setup">
+<h3>Inicio</h3>
+<p>Colonias: 1, 2, 3, 5, 6, 7M, 7H, 8, 9</p>
+<label>Nombre del sujeto:</label>
+<input id="subject" style="width:100%;padding:8px;border-radius:8px;border:1px solid #243145;background:#111826;color:#fff">
+<br><br><button class="btn" id="start">Empezar prueba</button>
+</div>
 
-    <section id="round1" class="card row hidden">
-      <div class="pill">Ronda 1 · Eliminatorias iniciales</div>
-      <div id="r1pairs" class="row"></div>
-      <div class="ctas">
-        <button class="btn btn-accent hidden" id="toRound2">Ir a Ronda 2</button>
-        <button class="btn btn-danger" id="reset1">Reiniciar ronda</button>
-      </div>
-    </section>
+<div class="card hidden" id="round1">
+<h3>Ronda 1 · Emparejamientos fijos</h3>
+<div id="r1pairs"></div>
+<button class="btn hidden" id="toRound2">Ir a Ronda 2</button>
+</div>
 
-    <section id="round2" class="card row hidden">
-      <div class="pill">Ronda 2 · Semifinal</div>
-      <div id="r2pairs" class="row"></div>
-      <div class="ctas">
-        <button class="btn btn-accent hidden" id="toFinal">Ir a Final</button>
-        <button class="btn btn-danger" id="reset2">Reiniciar ronda</button>
-      </div>
-    </section>
+<div class="card hidden" id="round2">
+<h3>Ronda 2 · Semifinal</h3>
+<div id="r2pairs"></div>
+<button class="btn hidden" id="toFinal">Ir a Final</button>
+</div>
 
-    <section id="final" class="card row hidden">
-      <div class="pill">Ronda 3 · Final (elige 1º, 2º, 3º)</div>
-      <div id="finalists" class="finalists"></div>
-      <div class="ctas">
-        <button class="btn btn-accent hidden" id="showResults">Mostrar resultado</button>
-        <button class="btn btn-danger" id="reset3">Reiniciar final</button>
-      </div>
-    </section>
+<div class="card hidden" id="final">
+<h3>Ronda 3 · Final (1ª / 2ª / 3ª)</h3>
+<div id="finalists"></div>
+<button class="btn hidden" id="showResults">Mostrar resultados</button>
+</div>
 
-    <section id="results" class="card row hidden">
-      <div class="pill">Resultados</div>
-      <div id="resultContent" class="row"></div>
-      <div class="ctas">
-        <button class="btn" id="copy">Copiar al portapapeles</button>
-        <button class="btn" id="export">Descargar CSV (este sujeto)</button>
-        <button class="btn" id="exportAll">Descargar CSV (todos)</button>
-        <button class="btn btn-danger" id="newTest">Nuevo sujeto</button>
-      </div>
-    </section>
-  </main>
-  <footer>© Test sensorial — Colonias | Funciona sin conexión · Guarda resultados en tu navegador</footer>
+<div class="card hidden" id="results">
+<h3>Resultados</h3>
+<div id="resultContent"></div>
+</div>
 
 <script>
-  // --- Data ---
-  const LABELS = ["1","2","3","5","6","7M","7H","A1","A2"]; // 9 items
-  let subject = "";
-  let r1Pairs = [];  // [[a,b],...], last item gets bye
-  let r1Winners = []; // array of labels + possible bye
-  let r2Pairs = [];
-  let r2Winners = []; // finalists (3)
-  let finalists = []; // 3 labels
-  let finalRanks = {}; // {label: 1|2|3}
+const LABELS=["1","2","3","5","6","7M","7H","8","9"];
+let subject='',r1Pairs=[],r1Winners=[],r2Pairs=[],r2Winners=[],finalists=[],finalRanks={};
+const $=s=>document.querySelector(s);
+function el(t,c,txt){const e=document.createElement(t);if(c)e.className=c;if(txt)e.textContent=txt;return e;}
+function clear(n){n.innerHTML='';}
+function show(id,vis){$(id).classList.toggle('hidden',!vis);}
 
-  // localStorage helpers
-  const LS_KEY = "colonias_resultados_v1";
-  function loadAll() {
-    try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch(_) { return []; }
-  }
-  function saveAll(arr) { localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
+function buildRound1(){
+ r1Pairs=[["1","2"],["3","5"],["6","7H"],["7M","8"]];
+ r1Winners=[]; const bye="9"; const cont=$("#r1pairs"); clear(cont);
+ r1Pairs.forEach(pair=>{
+   const wrap=el('div'); wrap.style.display='flex'; wrap.style.justifyContent='space-around';
+   pair.forEach(c=>{const d=el('div','choice');d.appendChild(el('div','code',c));
+     const b=el('button','btn','Elegir');b.onclick=()=>{if(!r1Winners.includes(c))r1Winners.push(c);checkComplete();};
+     d.appendChild(b);wrap.appendChild(d);});cont.appendChild(wrap);});
+ function checkComplete(){if(r1Winners.length===r1Pairs.length){r1Winners.push(bye);$("#toRound2").classList.remove('hidden');}}
+}
 
-  // --- UI helpers ---
-  const $ = sel => document.querySelector(sel);
-  function el(tag, cls, txt) { const e = document.createElement(tag); if(cls) e.className=cls; if(txt) e.textContent=txt; return e; }
-  function clear(node) { node.innerHTML = ""; }
-  function show(id, vis=true) { const s = $(id.startsWith("#")?id:"#"+id); if(!s) return; s.classList.toggle("hidden", !vis); }
+function buildRound2(){
+ r2Pairs=[];r2Winners=[];const arr=r1Winners.slice();const bye=arr.pop();
+ const cont=$("#r2pairs");clear(cont);
+ for(let i=0;i<arr.length;i+=2){const pair=[arr[i],arr[i+1]];r2Pairs.push(pair);
+   const wrap=el('div');wrap.style.display='flex';wrap.style.justifyContent='space-around';
+   pair.forEach(c=>{const d=el('div','choice');d.appendChild(el('div','code',c));
+     const b=el('button','btn','Elegir');b.onclick=()=>{if(!r2Winners.includes(c))r2Winners.push(c);checkComplete();};
+     d.appendChild(b);wrap.appendChild(d);});cont.appendChild(wrap);}
+ function checkComplete(){if(r2Winners.length===r2Pairs.length){r2Winners.push(bye);$("#toFinal").classList.remove('hidden');}}
+}
 
-  // --- Round builders ---
-  function buildRound1() {
-    r1Pairs = [];
-    r1Winners = [];
-    const base = LABELS.slice();
-    const bye = base.pop(); // 9th goes bye
-    const container = $("#r1pairs");
-    clear(container);
+function buildFinal(){
+ finalists=r2Winners.slice();finalRanks={};
+ const cont=$("#finalists");clear(cont);
+ finalists.forEach(c=>{const d=el('div','final-card');d.appendChild(el('div','code',c));
+ [1,2,3].forEach(rank=>{const b=el('button','btn',rank+'º');b.onclick=()=>setRank(c,rank);d.appendChild(b);});
+ cont.appendChild(d);});
+}
 
-    for (let i = 0; i < base.length; i += 2) {
-      const a = base[i], b = base[i+1];
-      const pair = [a,b];
-      r1Pairs.push(pair);
-      container.appendChild(pairCard(pair, winner => {
-        if (!r1Winners.includes(winner)) r1Winners.push(winner);
-        checkR1Complete(bye);
-      }));
-    }
-    // save bye to winners when complete
-    function checkR1Complete(byeLabel) {
-      const need = r1Pairs.length;
-      if (r1Winners.length === need) {
-        r1Winners.push(byeLabel);
-        $("#toRound2").classList.remove("hidden");
-      }
-    }
-  }
+function setRank(c,rank){
+ for(const k in finalRanks)if(finalRanks[k]===rank)delete finalRanks[k];
+ finalRanks[c]=rank;
+ document.querySelectorAll('.final-card').forEach(x=>x.classList.remove('winner','second','third'));
+ for(const [cc,r] of Object.entries(finalRanks)){
+   const card=[...document.querySelectorAll('.final-card')].find(x=>x.textContent.includes(cc));
+   if(!card)continue;
+   if(r===1)card.classList.add('winner');if(r===2)card.classList.add('second');if(r===3)card.classList.add('third');
+ }
+ if(Object.keys(finalRanks).length===3)$("#showResults").classList.remove('hidden');
+}
 
-  function pairCard([a,b], onPick) {
-    const wrap = el("div","row");
-    const pair = el("div","pair");
-    const ca = choiceCard(a, () => onPick(a));
-    const cb = choiceCard(b, () => onPick(b));
-    pair.appendChild(ca); pair.appendChild(cb);
-    wrap.appendChild(pair);
-    return wrap;
-  }
+function resultsView(){
+ const box=$("#resultContent");clear(box);
+ const arr=Object.entries(finalRanks).sort((a,b)=>a[1]-b[1]);
+ box.appendChild(el('p',null,'Sujeto: '+subject));
+ box.appendChild(el('p',null,'1ª: '+arr[0][0]+' | 2ª: '+arr[1][0]+' | 3ª: '+arr[2][0]));
+ box.appendChild(el('p',null,'Finalistas: '+finalists.join(', ')));
+}
 
-  function choiceCard(code, onClick) {
-    const d = el("div","choice");
-    const c = el("div","code", code);
-    const t = el("div","desc","Haz clic si prefieres esta");
-    const b = el("button","btn", "Elegir");
-    b.addEventListener("click", onClick);
-    d.appendChild(c); d.appendChild(t); d.appendChild(b);
-    return d;
-  }
-
-  function buildRound2() {
-    r2Pairs = [];
-    r2Winners = [];
-    const winners = r1Winners.slice(); // 5 items
-    const bye = winners.pop(); // last becomes bye to final
-    const container = $("#r2pairs");
-    clear(container);
-
-    for (let i = 0; i < winners.length; i += 2) {
-      const a = winners[i], b = winners[i+1];
-      const pair = [a,b];
-      r2Pairs.push(pair);
-      container.appendChild(pairCard(pair, winner => {
-        if (!r2Winners.includes(winner)) r2Winners.push(winner);
-        checkR2Complete(bye);
-      }));
-    }
-    function checkR2Complete(byeLabel) {
-      const need = r2Pairs.length;
-      if (r2Winners.length === need) {
-        r2Winners.push(byeLabel);
-        $("#toFinal").classList.remove("hidden");
-      }
-    }
-  }
-
-  function buildFinal() {
-    finalists = r2Winners.slice(); // 3
-    finalRanks = {};
-    const container = $("#finalists");
-    clear(container);
-    finalists.forEach(code => container.appendChild(finalCard(code)));
-  }
-
-  function finalCard(code) {
-    const wrap = el("div","final-card");
-    const title = el("div","code", code);
-    const note = el("div","desc","Asigna 1º, 2º o 3º");
-    const btns = el("div","rank-buttons");
-    [1,2,3].forEach(rank => {
-      const b = el("button","btn rank-btn", `${rank}º`);
-      b.addEventListener("click", () => setRank(code, rank, wrap));
-      btns.appendChild(b);
-    });
-    wrap.appendChild(title);
-    wrap.appendChild(note);
-    wrap.appendChild(btns);
-    return wrap;
-  }
-
-  function setRank(code, rank, wrap) {
-    // Ensure unique ranks (1,2,3) across finalists
-    // Remove any existing code with this rank
-    for (const c of Object.keys(finalRanks)) {
-      if (finalRanks[c] === rank) delete finalRanks[c];
-    }
-    finalRanks[code] = rank;
-    // Update visuals
-    document.querySelectorAll(".final-card").forEach(card => {
-      card.classList.remove("winner","second","third");
-    });
-    for (const [c,r] of Object.entries(finalRanks)) {
-      const card = Array.from(document.querySelectorAll(".final-card"))
-        .find(n => n.querySelector(".code").textContent === c);
-      if (!card) continue;
-      if (r === 1) card.classList.add("winner");
-      if (r === 2) card.classList.add("second");
-      if (r === 3) card.classList.add("third");
-    }
-    // If all ranks assigned, enable showResults
-    if (Object.keys(finalRanks).length === 3) $("#showResults").classList.remove("hidden");
-  }
-
-  function resultsView() {
-    // invert by rank
-    const byRank = Object.entries(finalRanks).sort((a,b)=>a[1]-b[1]); // [ [code,rank], ... ]
-    const gold = byRank.find(([_,r])=>r===1)?.[0];
-    const silver = byRank.find(([_,r])=>r===2)?.[0];
-    const bronze = byRank.find(([_,r])=>r===3)?.[0];
-
-    const box = $("#resultContent");
-    clear(box);
-
-    const line = (label, val, colorClass) => {
-      const row = el("div","result-line");
-      const k = el("strong", null, label);
-      const v = el("div", colorClass, val);
-      row.appendChild(k); row.appendChild(v);
-      return row;
-    };
-
-    box.appendChild(line("Sujeto:", subject));
-    const r1txt = r1Pairs.map(p=>p.join(" vs ")).join(" · ");
-    box.appendChild(line("R1 pares:", r1txt));
-    box.appendChild(line("R1 ganadoras:", r1Winners.join(", ")));
-    const r2txt = r2Pairs.map(p=>p.join(" vs ")).join(" · ");
-    box.appendChild(line("R2 pares:", r2txt));
-    box.appendChild(line("Finalistas:", finalists.join(", ")));
-    box.appendChild(line("🏆 1ª:", gold, "winner"));
-    box.appendChild(line("🥈 2ª:", silver, "second"));
-    box.appendChild(line("🥉 3ª:", bronze, "third"));
-
-    // persist to localStorage
-    const all = loadAll();
-    all.push({
-      ts: new Date().toISOString(),
-      subject,
-      labels: LABELS,
-      r1Pairs, r1Winners,
-      r2Pairs, finalists,
-      gold, silver, bronze
-    });
-    saveAll(all);
-  }
-
-  // CSV helpers
-  function toCSV(rows) {
-    return rows.map(r => r.map(x => {
-      const s = (x ?? "").toString();
-      return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
-    }).join(",")).join("\n");
-  }
-  function download(filename, text) {
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([text], {type:"text/csv;charset=utf-8;"}));
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  // --- Event wiring ---
-  $("#start").addEventListener("click", () => {
-    subject = $("#subject").value.trim();
-    if (!subject) { alert("Introduce el nombre o código del sujeto."); return; }
-    show("setup", false);
-    show("round1", true);
-    buildRound1();
-  });
-
-  $("#toRound2").addEventListener("click", () => {
-    show("round1", false);
-    show("round2", true);
-    buildRound2();
-  });
-
-  $("#toFinal").addEventListener("click", () => {
-    show("round2", false);
-    show("final", true);
-    buildFinal();
-  });
-
-  $("#showResults").addEventListener("click", () => {
-    show("final", false);
-    show("results", true);
-    resultsView();
-  });
-
-  // Resets per section
-  $("#reset1").addEventListener("click", () => { buildRound1(); $("#toRound2").classList.add("hidden"); });
-  $("#reset2").addEventListener("click", () => { buildRound2(); $("#toFinal").classList.add("hidden"); });
-  $("#reset3").addEventListener("click", () => { buildFinal(); $("#showResults").classList.add("hidden"); });
-
-  $("#newTest").addEventListener("click", () => {
-    subject = "";
-    $("#subject").value = "";
-    show("results", false);
-    show("setup", true);
-    // wipe transient state
-    r1Pairs = []; r1Winners = []; r2Pairs = []; r2Winners = []; finalists = []; finalRanks = {};
-  });
-
-  // Exports
-  $("#copy").addEventListener("click", () => {
-    const all = loadAll();
-    const last = all[all.length-1];
-    if (!last) { alert("No hay resultados aún."); return; }
-    const text = `Sujeto: ${last.subject}
-1ª: ${last.gold}
-2ª: ${last.silver}
-3ª: ${last.bronze}
-Finalistas: ${last.finalists.join(", ")}
-R1: ${last.r1Pairs.map(p=>p.join(" vs ")).join(" · ")} → ${last.r1Winners.join(", ")}
-R2: ${last.r2Pairs.map(p=>p.join(" vs ")).join(" · ")}`;
-    navigator.clipboard.writeText(text).then(()=>alert("Resultados copiados al portapapeles."));
-  });
-
-  $("#export").addEventListener("click", () => {
-    const all = loadAll();
-    const last = all[all.length-1];
-    if (!last) { alert("No hay resultados aún."); return; }
-    const rows = [
-      ["timestamp","sujeto","1a","2a","3a","finalistas","r1_pairs","r1_winners","r2_pairs"]
-    ];
-    rows.push([
-      last.ts, last.subject, last.gold, last.silver, last.bronze,
-      last.finalists.join(" | "),
-      last.r1Pairs.map(p=>p.join(" vs ")).join(" | "),
-      last.r1Winners.join(" | "),
-      last.r2Pairs.map(p=>p.join(" vs ")).join(" | ")
-    ]);
-    download(`result_${last.subject.replace(/\s+/g,"_")}.csv`, toCSV(rows));
-  });
-
-  $("#exportAll").addEventListener("click", () => {
-    const all = loadAll();
-    const rows = [["timestamp","sujeto","1a","2a","3a","finalistas","r1_pairs","r1_winners","r2_pairs"]];
-    all.forEach(r => rows.push([
-      r.ts, r.subject, r.gold, r.silver, r.bronze,
-      (r.finalists||[]).join(" | "),
-      (r.r1Pairs||[]).map(p=>p.join(" vs ")).join(" | "),
-      (r.r1Winners||[]).join(" | "),
-      (r.r2Pairs||[]).map(p=>p.join(" vs ")).join(" | ")
-    ]));
-    download(`resultados_todos.csv`, toCSV(rows));
-  });
-
+$("#start").onclick=()=>{subject=$("#subject").value.trim();if(!subject)return alert('Introduce un nombre');
+ show('#setup',false);show('#round1',true);buildRound1();};
+$("#toRound2").onclick=()=>{show('#round1',false);show('#round2',true);buildRound2();};
+$("#toFinal").onclick=()=>{show('#round2',false);show('#final',true);buildFinal();};
+$("#showResults").onclick=()=>{show('#final',false);show('#results',true);resultsView();};
 </script>
 </body>
 </html>
